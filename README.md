@@ -21,3 +21,6 @@ includes:
 > cd server
 
 > node index.js
+
+
+**for now, the code is configured for localhost. tthis can be easily changed in socket.js and similar files.**
