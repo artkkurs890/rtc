@@ -4,7 +4,7 @@
 includes:
 1. client
 2. server
-3.profile creation with customization
+3. profile creation with customization
 4.  room creation
 5. real-time notification
 6. room messages are stored in localstorage
