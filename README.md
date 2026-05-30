@@ -23,4 +23,4 @@ includes:
 > node index.js
 
 
-**for now, the code is configured for localhost. tthis can be easily changed in socket.js and similar files.**
+**for now, the code is configured for localhost. tthis can be easily changed in socket.js, index.js and similar files.**
