@@ -12,12 +12,12 @@ includes:
 
 # How to run?
 
-**To run the client:**
+**to run the client:**
 > cd client
 
 > npm run dev
 
-**To run the server:**
+**to run the server:**
 > cd server
 
 > node index.js
