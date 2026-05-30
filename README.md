@@ -14,8 +14,10 @@ includes:
 
 **To run the client:**
 > cd client
+
 > npm run dev
 
 **To run the server:**
 > cd server
+
 > node index.js
