@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import EmojiPicker from 'emoji-picker-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import socket from './socket';
 
@@ -10,39 +9,40 @@ function App() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [users, setUsers] = useState([]);
-  const [showEmoji, setShowEmoji] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
   const scrollRef = useRef(null);
 
   const joinRoom = () => {
-    if (room !== "" && profile.username !== "") {
+    if (room && profile.username) {
       socket.emit("join_room", { room, profile });
       setJoined(true);
     }
   };
 
   const sendMessage = () => {
-    if (message.trim() !== "") {
+    if (message.trim()) {
       socket.emit("chat_message", { 
         room, 
         message, 
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        profile: profile 
+        profile 
       });
       setMessage("");
     }
   };
 
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   }, [chat]);
 
   useEffect(() => {
     const handleReceive = (data) => setChat((prev) => [...prev, data]);
     const handleUsers = (list) => setUsers(list);
     
-    socket.off("receive_message").on("receive_message", handleReceive);
-    socket.off("update_user_list").on("update_user_list", handleUsers);
+    socket.on("receive_message", handleReceive);
+    socket.on("update_user_list", handleUsers);
     
     return () => { 
       socket.off("receive_message", handleReceive); 
@@ -75,22 +75,25 @@ function App() {
         </div>
         <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
           <AnimatePresence>
-            {chat.map((m, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                style={{
-                  alignSelf: m.isSystem ? "center" : (m.senderProfile?.username === profile.username ? "flex-end" : "flex-start"),
-                  background: m.isSystem ? "transparent" : (m.senderProfile?.username === profile.username ? profile.color : "#fff"),
-                  color: m.isSystem ? "#666" : (m.senderProfile?.username === profile.username ? "#fff" : "#333"),
-                  padding: "10px 15px", borderRadius: "18px", maxWidth: "60%"
-                }}>
-                {!m.isSystem && m.senderProfile && (
-                  <div style={{ fontSize: "10px", fontWeight: "bold", cursor: "pointer", textDecoration: "underline" }} onClick={() => setSelectedProfile(m.senderProfile)}>
-                    {m.senderProfile.avatar} {m.senderProfile.username}
-                  </div>
-                )}
-                <div>{m.message}</div>
-              </motion.div>
-            ))}
+            {chat.map((m, i) => {
+              const isMe = m.senderProfile?.username === profile.username;
+              return (
+                <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  style={{
+                    alignSelf: m.isSystem ? "center" : (isMe ? "flex-end" : "flex-start"),
+                    background: m.isSystem ? "transparent" : (isMe ? profile.color : "#fff"),
+                    color: m.isSystem ? "#666" : (isMe ? "#fff" : "#333"),
+                    padding: "10px 15px", borderRadius: "18px", maxWidth: "60%"
+                  }}>
+                  {!m.isSystem && m.senderProfile && (
+                    <div style={{ fontSize: "10px", fontWeight: "bold", cursor: "pointer", textDecoration: "underline" }} onClick={() => setSelectedProfile(m.senderProfile)}>
+                      {m.senderProfile.avatar} {m.senderProfile.username}
+                    </div>
+                  )}
+                  <div>{m.message}</div>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
       </div>
